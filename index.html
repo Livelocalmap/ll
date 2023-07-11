@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Simple Leaflet Map - Search</title>
+<meta charset="utf-8" />
+<!-- Leaflet CSS/js -->
+<link rel="stylesheet" type="text/css" href="lib/leaflet/leaflet.css">
+<style>
+  #map {
+    width: 100%;
+    height: 100vh;
+  }
+</style>
+</head>
+<body>
+  <label for="searchQuery">Search:</label>
+  <input type="text" id="searchQuery" placeholder="Enter the location">
+  <button id="searchButton" onclick="performSearch()">Search</button>
+
+  <div id="map"></div>
+
+  <script type="text/javascript" src="lib/leaflet/leaflet.js"></script>
+  <script type="text/javascript" src="lib/Control.Geocoder.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/postal-codes-js"></script>
+
+  <script>
+    var map = new L.Map('map').setView([8.4698, 76.9714], 8);
+    var mapLink = '<a href="http://20.235.80.243">OpenStreetMap</a>';
+    L.tileLayer('http://20.235.80.243/hot/{z}/{x}/{y}.png', {
+      attribution: 'Map data &copy; ' + mapLink,
+      maxZoom: 18
+    }).addTo(map);
+
+    var searchMarker;
+
+    // Function to perform the search
+    function performSearch() {
+      var searchQuery = document.getElementById('searchQuery').value.trim();
+      
+      // Clear existing markers
+      if (typeof searchMarker !== 'undefined') {
+        map.removeLayer(searchMarker);
+      }
+
+      // Perform the geocoding/search
+      L.Control.Geocoder.nominatim().geocode(searchQuery, function (results) {
+        if (results && results.length > 0) {
+          var result = results[0];
+          var coordinates = result.center;
+          var lat = coordinates.lat;
+          var lon = coordinates.lng;
+
+          // Create a draggable marker at the search location
+          searchMarker = L.marker([lat, lon], { draggable: true }).addTo(map);
+
+          // Pan and zoom the map to the search location
+          map.setView([lat, lon], 12);
+
+          // Fetch postal code (postcode) of the searched location
+          var postalCode = getPostalCode(lat, lon);
+          console.log('Postal Code:', postalCode);
+
+          // Update marker position on dragend
+          searchMarker.on('dragend', function (event) {
+            var marker = event.target;
+            var position = marker.getLatLng();
+            var lat = position.lat;
+            var lon = position.lng;
+            console.log('Marker position:', lat, lon);
+
+            // Fetch postal code (postcode) of the updated marker position
+            var postalCode = getPostalCode(lat, lon);
+            console.log('Postal Code:', postalCode);
+
+            // Update marker popup content with place name and postal code
+            marker.setPopupContent(getMarkerPopupContent(result));
+          });
+
+          // Set initial marker popup content with place name and postal code
+          searchMarker.bindPopup(getMarkerPopupContent(result)).openPopup();
+        } else {
+          alert('No results found for the search query.');
+        }
+      });
+    }
+
+    // Function to fetch postal code (postcode) based on coordinates
+    function getPostalCode(latitude, longitude) {
+      var postalCodeData = postalCodes.lookup(latitude, longitude);
+      if (postalCodeData && postalCodeData.length > 0) {
+        return postalCodeData[0].postalCode;
+      }
+      return '';
+    }
+
+    // Function to generate marker popup content with place name and postal code
+    function getMarkerPopupContent(result) {
+      var placeName = result.properties.name || '';
+      var postalCode = result.properties.postcode || '';
+      return '<strong>' + placeName + '</strong><br>' + postalCode;
+    }
+  </script>
+</body>
+</html>

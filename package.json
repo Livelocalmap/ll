@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "postal-codes-js": "^2.5.2"
+  }
+}
