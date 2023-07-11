@@ -73,11 +73,12 @@
             console.log('Postal Code:', postalCode);
 
             // Update marker popup content with place name and postal code
-            marker.setPopupContent(getMarkerPopupContent(result));
+            marker.getPopup().setContent(getMarkerPopupContent(result));
           });
 
-          // Set initial marker popup content with place name and postal code
-          searchMarker.bindPopup(getMarkerPopupContent(result)).openPopup();
+          // Create marker popup with place name and postal code
+          var markerPopupContent = getMarkerPopupContent(result);
+          searchMarker.bindPopup(markerPopupContent).openPopup();
         } else {
           alert('No results found for the search query.');
         }
@@ -97,7 +98,8 @@
     function getMarkerPopupContent(result) {
       var placeName = result.properties.name || '';
       var postalCode = result.properties.postcode || '';
-      return '<strong>' + placeName + '</strong><br>' + postalCode;
+      var content = '<strong>' + placeName + '</strong><br>' + postalCode;
+      return content;
     }
   </script>
 </body>
