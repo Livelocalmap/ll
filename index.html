@@ -6,6 +6,7 @@
 <!-- Leaflet CSS/js -->
 <link rel="stylesheet" type="text/css" href="lib/leaflet/leaflet.css">
 <style>
+  .leaflet-tile-container { pointer-events: auto; }
   #map {
     width: 100%;
     height: 100vh;
@@ -13,23 +14,36 @@
 </style>
 </head>
 <body>
-  <label for="searchQuery">Search:</label>
-  <input type="text" id="searchQuery" placeholder="Enter the location">
+  <label for="searchQuery"></label>
+  <input type="text" id="searchQuery" placeholder="Enter location">
   <button id="searchButton" onclick="performSearch()">Search</button>
 
-  <div id="map"></div>
-
+  <style>
+    #searchButton {
+      width: 80px;
+      height: 38px;
+      font-size: 16px;
+    }
+    #searchQuery {
+        width: 200px;
+        height: 30px;
+        font-size: 16px;
+    }
+    </style>
+    <div id="map"></div>
   <script type="text/javascript" src="lib/leaflet/leaflet.js"></script>
   <script type="text/javascript" src="lib/Control.Geocoder.js"></script>
-  <script type="text/javascript" src="https://unpkg.com/postal-codes-js"></script>
-
+  <script type="text/javascript" src="lib/"></script>
+  <script src="https://unpkg.com/leaflet-hash@0.2.1/leaflet-hash.js"></script>
   <script>
-    var map = new L.Map('map').setView([8.4698, 76.9714], 8);
-    var mapLink = '<a href="https://www.openstreetmap.org">OpenStreetMap</a>';
-    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: 'Map data &copy; ' + mapLink,
-      maxZoom: 18
-    }).addTo(map);
+    var map = L.map('map').setView([8.4803, 77.1890], 11);
+
+L.tileLayer('http://20.235.80.243/hot/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 30,
+    maxNativeZoom: 29
+}).addTo(map);
+var hash = L.hash(map)
 
     var searchMarker;
 
